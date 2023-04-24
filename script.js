@@ -3,8 +3,8 @@ class User {
     this.id = id;
     this.name = name;
     this.price = price;
-    this.detail= detail;
-    this.color= color;
+    this.detail = detail;
+    this.color = color;
   }
 }
 
@@ -30,11 +30,13 @@ class App {
     initseditHandle();
   }
 }
-  
-let users = [];
+function setUserToLocalStorage(users = []) {
+  localStorage.users = JSON.stringify(users);
+}
+
+let users = localStorage?.['users'] ? JSON.parse(localStorage?.['users']) : [];
+console.log(users);
 let app = new App();
-let userCreate = new User(1, 'Đào Hường', '10', 'hihi', 'blue');
-users.push(userCreate);
 app.renderUser(users);
 
 let submitBtn = document.querySelector('#submit');
@@ -65,7 +67,6 @@ class ValidateInput {
   }
 }
 
-
 submitBtn.addEventListener('click', function () {
   if (editId) {
     let userEditIndex = users.findIndex((item) => item.id == editId);
@@ -86,16 +87,23 @@ submitBtn.addEventListener('click', function () {
     resetError();
     if (errors.length > 0) {
       for (let [key, mess] of errors) {
-        document.querySelector(`.${key}-error`).innerHTML  = mess;
+        document.querySelector(`.${key}-error`).innerHTML = mess;
       }
       return;
     }
 
-    let userCreate = new User(id, nameEl.value, priceEl.value, detailEl.value, colorEl.value)
+    let userCreate = new User(
+      id,
+      nameEl.value,
+      priceEl.value,
+      detailEl.value,
+      colorEl.value
+    );
     users.push(userCreate);
     app.renderUser(users);
     resetForm();
   }
+  setUserToLocalStorage(users);
 });
 
 function resetError() {
@@ -110,8 +118,7 @@ function resetForm() {
   editId = '';
 }
 
-
-function initseditHandle(){
+function initseditHandle() {
   let editBtns = document.querySelectorAll('.btn-edit');
   editBtns.forEach((item) => {
     item.addEventListener('click', function () {
@@ -126,19 +133,19 @@ function initseditHandle(){
   });
 }
 
-
 function initsDeleteHandle() {
   let deleteBtns = document.querySelectorAll('.btn-delete');
   deleteBtns.forEach((item) => {
     item.addEventListener('click', function () {
       let isDelete = confirm('Are you sure to delete this data?');
       if (isDelete) {
-        let id = item.getAttribute('data-id'); 
-        let userIndex = users.findIndex((item) => item.id == id); 
+        let id = item.getAttribute('data-id');
+        let userIndex = users.findIndex((item) => item.id == id);
         console.log(users);
-        users.splice(userIndex, 1); 
-        app.renderUser(users); 
+        users.splice(userIndex, 1);
+        app.renderUser(users);
       }
+      setUserToLocalStorage(users);
     });
   });
 }
